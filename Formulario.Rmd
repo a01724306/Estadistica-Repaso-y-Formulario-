@@ -1,0 +1,615 @@
+---
+title: "Formulario"
+author: "Alejandro Martínez Páez - A01286707"
+date: "2025-10-20"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# 1. PROBABILIDAD Y CONJUNTOS
+
+#P(A) = número de casos favorables/casos totales posibles
+
+# Regla de la Suma: P(A U B) = P(A) + P(B) - P(A ∩ B)
+# Regla de la multiplicación: 
+#     Si A y B son eventos independientes: P(A AND B) = P(A)*P(B) & P(A|B) = P(A)
+#     Si A y B son eventos dependientes: P(A AND B) = P(A)*P(B|A) = P(B)*P(A|B)
+
+# Probabilidad condicional (Eventos dependientes): P(A|B) = P(A ∩ B)/P(B)
+# P(A AND B AND C) = P(A) * P(B|A)*P(C|A AND B)
+
+# P(B) = P(B|A)*P(A) + P(B|C)*P(C) + P(B|D)*P(D)
+
+# 2. TEOREMA DE BAYES
+# Fórmula: P(A|B) = [ P(B|A) * P(A) ] / P(B)
+# Donde P(B) = P(B|A)*P(A) + P(B|no A)*P(no A)
+
+# p_a <- Probabilidad a priori de A
+# p_b_dado_a <- Probabilidad condicional de B dado A
+# p_b_dado_no_a <- Probabilidad condicional de B dado no A
+# p_b_total <- (p_b_dado_a * p_a) + (p_b_dado_no_a * (1 - p_a))
+# p_a_dado_b <- (p_b_dado_a * p_a) / p_b_total
+
+#CONTEO
+# Principio Aditivo
+# N = n1 + n2 + ... + nk
+total_aditivo <- opciones_1 + opciones_2
+
+# Principio Multiplicativo
+# N = n1 * n2 * ... * nk
+total_multiplicativo <- opciones_paso_1 * opciones_paso_2
+
+# Permutaciones (el orden importa)
+# P(n, k) = n! / (n-k)!
+n <- 0 # número total de objetos
+k <- 0 # número de objetos a seleccionar
+permutaciones <- factorial(n) / factorial(n - k)
+
+# Permutaciones con Repetición (elementos idénticos)
+# Se usa para ordenar un conjunto de 'n' objetos donde algunos son idénticos.
+# Fórmula: n! / (n1! * n2! * ... * nk!)
+# donde n1, n2, ... son las cantidades de cada elemento idéntico.
+
+n_total <- 4
+repeticiones <- c(2, 1, 1) # Vector con las frecuencias de cada letra
+
+permutaciones_rep <- factorial(n_total) / prod(factorial(repeticiones))
+# La función prod() multiplica todos los elementos del vector (factorial(2)*factorial(1)*...)
+
+# Combinaciones (el orden NO importa)
+# C(n, k) = n! / [k! * (n-k)!]
+n <- 0 # número total de objetos
+k <- 0 # número de objetos a seleccionar
+combinaciones <- choose(n, k)
+
+# 3. DISTRIBUCIONES DISCRETAS
+
+# --- Binomial --- número FIJO de ensayos (n) y estoy contando los éxitos
+# n = número de ensayos, p = probabilidad de éxito
+# Valor Esperado: E[X] = n * p
+# Varianza: V[X] = n * p * (1 - p)
+dbinom(x = k, size = n, prob = p)   # P(X = k)
+pbinom(q = k, size = n, prob = p)   # P(X <= k)
+
+# --- Geométrica ---  ensayos HASTA que ocurra el PRIMER éxito
+# p = probabilidad de éxito
+# Valor Esperado: E[X] = 1 / p  (número de ensayos hasta el primer éxito)
+# Varianza: V[X] = (1 - p) / p^2
+# OJO: R cuenta 'x' como el número de FRACASOS antes del primer éxito.
+dgeom(x = num_fracasos, prob = p) # P(num_fracasos antes del 1er éxito)
+pgeom(q = num_fracasos, prob = p) # P(<= num_fracasos antes del 1er éxito)
+
+# --- Binomial Negativa --- ensayos HASTA que ocurra un número `r` de éxitos
+# r = número de éxitos deseados, p = probabilidad de éxito
+# Valor Esperado: E[X] = r / p  (número de ensayos para r éxitos)
+# Varianza: V[X] = r * (1 - p) / p^2
+# OJO: R cuenta 'x' como el número de FRACASOS antes de los 'r' éxitos.
+dnbinom(x = num_fracasos, size = r, prob = p) # P(num_fracasos)
+pnbinom(q = num_fracasos, size = r, prob = p) # P(<= num_fracasos)
+
+# --- Hipergeométrica --- población finita SIN REEMPLAZO
+# N = tamaño de la población, K = número de éxitos en la población
+# n = tamaño de la muestra
+# Valor Esperado: E[X] = n * (K / N)
+# Varianza: V[X] = n * (K/N) * (1 - K/N) * ( (N-n)/(N-1) )
+# Parámetros en R: m=K, n=N-K, k=n
+dhyper(x = k, m = K, n = N - K, k = n) # P(X = k)
+phyper(q = k, m = K, n = N - K, k = n) # P(X <= k)
+
+# --- Poisson --- PROMEDIO de eventos en un intervalo
+# lambda = número promedio de eventos por intervalo
+# Valor Esperado: E[X] = lambda
+# Varianza: V[X] = lambda
+dpois(x = k, lambda = lambda) # P(X = k)
+ppois(q = k, lambda = lambda) # P(X <= k)
+
+# 4. DISTRIBUCIÓN CONTINUA (EXPONENCIAL)
+# beta = 1/lambda
+# lambda = tasa promedio de eventos (rate)
+# Valor Esperado: E[X] = 1 / lambda
+# Varianza: V[X] = 1 / lambda^2
+pexp(q = x, rate = lambda) # P(X <= x)
+qexp(p = prob, rate = lambda) # Devuelve el valor 'x' para una probabilidad 'p' dada
+
+# --- Normal ---
+# μ = media, σ = desviación estándar
+# Valor Esperado: E[X] = μ, Varianza: V[X] = σ²
+pnorm(q = valor, mean = mu, sd = sigma)  # P(X <= valor)
+qnorm(p = prob, mean = mu, sd = sigma)  # Devuelve valor para una prob.
+
+# --- Gamma ---
+# α = forma (shape), β = escala (scale)
+# Valor Esperado: E[X] = α * β, Varianza: V[X] = α * β²
+pgamma(q = valor, shape = alfa, scale = beta)
+qgamma(p = prob, shape = alfa, scale = beta)
+
+# --- Exponencial (Caso especial de Gamma con α=1) ---
+# λ = tasa (rate). En R, rate = 1/β.
+# Valor Esperado: E[X] = 1 / λ, Varianza: V[X] = 1 / λ²
+pexp(q = valor, rate = lambda)
+qexp(p = prob, rate = lambda)
+
+# --- Chi-cuadrada (χ²) (Caso especial de Gamma) ---
+# k = grados de libertad (df)
+# Valor Esperado: E[X] = k, Varianza: V[X] = 2k
+pchisq(q = valor, df = k)
+qchisq(p = prob, df = k)
+
+# 5. GENERALIZACIÓN DE VARIABLE ALEATORIA
+
+# -- Discretas --
+#Suma de sus probabilidades debe de ser = 1
+#Valor esperado = miu
+# x_valores <- vector con los valores de la variable aleatoria
+# p_probabilidades <- vector con las probabilidades de cada valor
+# valor_esperado <- sum(x_valores * p_probabilidades)
+# varianza <- sum((x_valores - valor_esperado)^2 * p_probabilidades)
+
+# -- Continuas --
+# Se necesita definir la pdf, f(x), como una función en R.
+# Ejemplo: f(x) = 2x para 0 <= x <= 1
+f_de_x <- function(x) { 2 * x }
+
+# --- Valor Esperado: E[X] = ∫ x*f(x) dx ---
+
+# 1. Se define una nueva función para x*f(x)
+integrando_media <- function(x) { x * f_de_x(x) }
+
+# 2. Se integra en el dominio de la variable
+resultado_media <- integrate(integrando_media, lower = 0, upper = 1)
+valor_esperado <- resultado_media$value # Se extrae el valor numérico
+
+# --- Varianza: V[X] = ∫ (x - E[X])² * f(x) dx ---
+
+# 1. Se define una nueva función para (x - E[X])² * f(x)
+integrando_varianza <- function(x) { (x - valor_esperado)^2 * f_de_x(x) }
+
+# 2. Se integra en el dominio de la variable
+resultado_varianza <- integrate(integrando_varianza, lower = 0, upper = 1)
+varianza <- resultado_varianza$value # Se extrae el valor numérico
+
+# 7. INTERVALOS DE CONFIANZA (UNA POBLACIÓN)
+
+#Para la Media (μ)
+
+# Caso 1 y 2: σ CONOCIDA o n ≥ 30 (se usa Z)
+# Fórmula: x̄ ± z_(α/2) * (σ / sqrt(n))
+# Se calcula manualmente en R.
+
+# Caso 3: σ DESCONOCIDA, n < 30, población Normal (se usa t)
+# Fórmula: x̄ ± t_(α/2, n-1) * (s / sqrt(n))
+# En R:
+# resultado_t <- t.test(datos_muestra)
+# print(resultado_t$conf.int)
+
+#Para la Proporción (p)
+# Condición: np > 5 y n(1-p) > 5
+# Fórmula: p̂ ± z_(α/2) * sqrt(p̂(1-p̂)/n)
+# En R:
+# resultado_prop <- prop.test(x = k_exitos, n = n_total)
+# print(resultado_prop$conf.int)
+
+#Para la Varianza (σ²)
+# Condición: población Normal
+# Fórmula: [(n-1)s² / χ²_(1-α/2), (n-1)s² / χ²_(α/2)]
+
+# 8. INTERVALOS DE CONFIANZA (DOS POBLACIONES)
+
+# Diferencia de Proporciones (p1 - p2)
+# Condición: n1p1>10, n1q1>10 y n2p2>10, n2q2>10
+# Fórmula: (p̂1 - p̂2) ± z_(α/2) * sqrt(p̂1q̂1/n1 + p̂2q̂2/n2)
+# exitos_vect <- c(exitos1, exitos2)
+# muestras_vect <- c(n1, n2)
+# prop.test(x = exitos_vect, n = muestras_vect)
+
+# Cociente de Varianzas (σ1² / σ2²)
+# Condición: Ambas poblaciones son Normales
+# Nota: Si el 1 no está en el intervalo, se rechaza que las varianzas son iguales
+# En R:
+# var.test(datos_g1, datos_g2)
+
+# Diferencia de Medias (μ1 - μ2) - Muestras Independientes
+
+# Caso 1: σ1 y σ2 conocidas (o n1, n2 >= 40) -> Prueba Z
+# Fórmula: (x̄1 - x̄2) ± z_(α/2) * sqrt(σ1²/n1 + σ2²/n2)
+# Requiere: library(BSDA)
+# z.test(x = datos_g1, y = datos_g2, sigma.x = sigma1, sigma.y = sigma2)
+
+# Caso 2: σ1 y σ2 desconocidas e IGUALES, n1 o n2 < 40 -> t-test agrupado
+# Fórmula: (x̄1 - x̄2) ± t_(α/2, gl) * Sp * sqrt(1/n1 + 1/n2)
+# En R:
+# t.test(datos_g1, datos_g2, var.equal = TRUE)
+
+# Caso 3: σ1 y σ2 desconocidas y DIFERENTES, n1 o n2 < 40 -> t-test de Welch
+# Fórmula: (x̄1 - x̄2) ± t_(α/2, gl) * sqrt(s1²/n1 + s2²/n2)
+# En R (es el comportamiento por defecto):
+# t.test(datos_g1, datos_g2, var.equal = FALSE)
+
+
+# 7. PRUEBAS DE HIPÓTESIS (UNA POBLACIÓN)
+
+# La decisión se toma comparando el p-value con el nivel de significancia (alpha)
+# Si p-value < alpha, se rechaza H0.
+
+# --- Media (Prueba t) ---
+# datos_muestra <- vector con los datos
+# mu0 <- valor de la media bajo H0
+# Para Ha: mu > mu0, usar alternative = "greater"
+# Para Ha: mu < mu0, usar alternative = "less"
+# Para Ha: mu != mu0, usar alternative = "two.sided"
+# t.test(datos_muestra, mu = mu0, alternative = "two.sided")
+
+# --- Proporción (Prueba Z) ---
+# k_exitos <- número de éxitos observados
+# n_total <- tamaño de la muestra
+# p0 <- valor de la proporción bajo H0
+# prop.test(x = k_exitos, n = n_total, p = p0, alternative = "two.sided")
+
+
+# 8. INTERPRETACIÓN DE Z FRONTERA (VALOR CRÍTICO)
+
+# z_frontera es el número de errores estándar que te alejas de la media para construir un IC.
+# Representa el límite de la región de aceptación de H0.
+
+# Para un IC del 95% (alpha = 0.05, dos colas)
+z_95 <- qnorm(1 - 0.05 / 2) # Resultado: 1.96
+
+# Para un IC del 99% (alpha = 0.01, dos colas)
+z_99 <- qnorm(1 - 0.01 / 2) # Resultado: 2.576
+
+# Para un IC del 90% (alpha = 0.10, dos colas)
+z_90 <- qnorm(1 - 0.10 / 2) # Resultado: 1.645
+```
+
+
+# Calculadora de Intervalos de Confianza
+
+## 1. Para la Media (σ conocida)
+
+```{r}
+media_muestral <- 65.2
+sigma <- 3
+n <- 25
+alpha <- 0.05
+
+z_critico <- qnorm(1 - alpha/2)
+error <- z_critico * sigma / sqrt(n)
+lim_inf <- media_muestral - error
+lim_sup <- media_muestral + error
+
+cat("IC para μ (σ conocida):\n")
+cat("Límite Inferior:", round(lim_inf, 3), "\n")
+cat("Límite Superior:", round(lim_sup, 3), "\n")
+```
+
+## 2. Para la Media (σ desconocida)
+
+```{r}
+media_muestral <- 65.2
+s <- 3.1
+n <- 25
+alpha <- 0.05
+gl <- n - 1
+
+t_critico <- qt(1 - alpha/2, gl)
+error <- t_critico * s / sqrt(n)
+lim_inf <- media_muestral - error
+lim_sup <- media_muestral + error
+
+cat("IC para μ (σ desconocida):\n")
+cat("Límite Inferior:", round(lim_inf, 3), "\n")
+cat("Límite Superior:", round(lim_sup, 3), "\n")
+```
+
+## 3. Para la Varianza (σ²)
+
+```{r}
+s2 <- 9.61
+n <- 25
+alpha <- 0.05
+gl <- n - 1
+
+chi_inf <- qchisq(alpha/2, gl)
+chi_sup <- qchisq(1 - alpha/2, gl)
+
+lim_inf_var <- (n-1)*s2 / chi_sup
+lim_sup_var <- (n-1)*s2 / chi_inf
+
+cat("IC para σ²:\n")
+cat("Límite Inferior:", round(lim_inf_var, 3), "\n")
+cat("Límite Superior:", round(lim_sup_var, 3), "\n")
+
+# Para desviación estándar
+cat("IC para σ:\n")
+cat("Límite Inferior:", round(sqrt(lim_inf_var), 3), "\n")
+cat("Límite Superior:", round(sqrt(lim_sup_var), 3), "\n")
+```
+
+## 4. Para el Cociente de Varianzas (σ₁²/σ₂²)
+
+```{r}
+s1_cuad <- 11.85
+s2_cuad <- 4.94
+n1 <- 10
+n2 <- 10
+alpha <- 0.05
+
+gl1 <- n1 - 1
+gl2 <- n2 - 1
+
+F_inf <- qf(alpha/2, gl1, gl2)
+F_sup <- qf(1 - alpha/2, gl1, gl2)
+
+cociente <- s1_cuad / s2_cuad
+lim_inf_coc <- cociente / F_sup
+lim_sup_coc <- cociente / F_inf
+
+cat("IC para σ₁²/σ₂²:\n")
+cat("Límite Inferior:", round(lim_inf_coc, 3), "\n")
+cat("Límite Superior:", round(lim_sup_coc, 3), "\n")
+cat("Cociente muestral:", round(cociente, 3), "\n")
+```
+
+## 5. Valores Críticos F
+
+```{r}
+gl1 <- 9
+gl2 <- 9
+alpha <- 0.05
+
+# F inferior (cola izquierda)
+F_lower <- qf(alpha/2, gl1, gl2)
+
+# F superior (cola derecha) 
+F_upper <- qf(1 - alpha/2, gl1, gl2)
+
+cat("Valores críticos F:\n")
+cat("F inferior (α/2):", round(F_lower, 3), "\n")
+cat("F superior (1-α/2):", round(F_upper, 3), "\n")
+```
+
+## 6. Valores Críticos Chi-Cuadrado
+
+```{r}
+gl <- 11
+alpha <- 0.05
+
+# Chi-cuadrado inferior
+crit_lower <- qchisq(alpha/2, df = gl)
+
+# Chi-cuadrado superior
+crit_upper <- qchisq(1 - alpha/2, df = gl)
+
+cat("Valores críticos χ²:\n")
+cat("χ² inferior:", round(crit_lower, 3), "\n")
+cat("χ² superior:", round(crit_upper, 3), "\n")
+```
+
+
+```{r}
+# Calculadora de Pruebas de Hipótesis con Fórmulas Desarrolladas
+
+# PRUEBAS DE UNA POBLACIÓN
+
+## 1. Prueba para la Media (σ conocida o n >= 30) - Prueba Z
+
+# Ho: μ = μ₀
+# Ha: μ ≠ μ₀ (bilateral), μ > μ₀ (unilateral der.), μ < μ₀ (unilateral izq.)
+
+#Datos de entrada
+x_bar_1p_z <- 52.5   # Media muestral
+mu0 <- 50            # Media bajo H0
+sigma <- 5           # Desviación estándar poblacional conocida
+n_1p_z <- 40         # Tamaño de la muestra
+alpha <- 0.05        # Nivel de significancia
+
+# Cálculos
+# Fórmula: Z* = (X̄ - μ₀) / (σ / sqrt(n))
+z_estadistico <- (x_bar_1p_z - mu0) / (sigma / sqrt(n_1p_z))
+
+# Valores críticos
+z_crit_bilateral <- qnorm(1 - alpha/2) # Para Ha: ≠
+z_crit_unilateral <- qnorm(1 - alpha)  # Para Ha: >
+
+#Resultados
+cat("## 1. Prueba Z para la Media (σ conocida) ##\n")
+cat("Media muestral (x̄):", x_bar_1p_z, "\n")
+cat("Estadístico de prueba Z*:", round(z_estadistico, 4), "\n")
+cat("Valor crítico bilateral (±):", round(z_crit_bilateral, 4), "\n")
+cat("¿Rechazar H0 (bilateral)?:", abs(z_estadistico) > z_crit_bilateral, "\n\n")
+
+
+## 2. Prueba para la Media (σ desconocida, n < 30) - Prueba t
+
+# Ho: μ = μ₀
+# Ha: μ ≠ μ₀
+
+# Datos de entrada 
+datos_muestra <- c(52, 55, 48, 51, 49, 53)
+mu0_t <- 50
+alpha_t <- 0.05
+
+#Cálculos
+x_bar_1p_t <- mean(datos_muestra)
+s_1p_t <- sd(datos_muestra)
+n_1p_t <- length(datos_muestra)
+gl_1p_t <- n_1p_t - 1
+
+# Fórmula: T* = (X̄ - μ₀) / (s / sqrt(n))
+t_estadistico <- (x_bar_1p_t - mu0_t) / (s_1p_t / sqrt(n_1p_t))
+
+# Valor crítico
+t_crit_bilateral <- qt(1 - alpha_t/2, df = gl_1p_t)
+
+# Resultados
+cat("## 2. Prueba t para la Media (σ desconocida) ##\n")
+cat("Media muestral (x̄):", round(x_bar_1p_t, 4), "\n")
+cat("Estadístico de prueba T*:", round(t_estadistico, 4), "\n")
+cat("Grados de libertad:", gl_1p_t, "\n")
+cat("Valor crítico bilateral (±):", round(t_crit_bilateral, 4), "\n")
+cat("¿Rechazar H0 (bilateral)?:", abs(t_estadistico) > t_crit_bilateral, "\n\n")
+
+## 3. Prueba para la Proporción (p)
+
+# Ho: p = p₀
+# Ha: p > p₀
+
+#Datos de entrada
+exitos_1p_p <- 85
+n_1p_p <- 100
+p0 <- 0.80
+alpha_p <- 0.05
+
+# Cálculos
+p_gorro <- exitos_1p_p / n_1p_p
+
+# Fórmula: Z* = (p̂ - p₀) / sqrt(p₀(1-p₀)/n)
+z_estadistico_p <- (p_gorro - p0) / sqrt(p0 * (1 - p0) / n_1p_p)
+
+# Valor crítico
+z_crit_unilateral_p <- qnorm(1 - alpha_p)
+
+#Resultados
+cat("## 3. Prueba Z para la Proporción ##\n")
+cat("Proporción muestral (p̂):", p_gorro, "\n")
+cat("Estadístico de prueba Z*:", round(z_estadistico_p, 4), "\n")
+cat("Valor crítico unilateral (>):", round(z_crit_unilateral_p, 4), "\n")
+cat("¿Rechazar H0 (unilateral >)?:", z_estadistico_p > z_crit_unilateral_p, "\n\n")
+
+# PRUEBAS DE DOS POBLACIONES
+
+## 4. Prueba para Diferencia de Medias (σ conocidas) - Prueba Z
+
+# Ho: μ₁ - μ₂ = 0
+# Ha: μ₁ - μ₂ ≠ 0
+
+#Datos de entrada
+x1_bar <- 16.015; n1 <- 10; sigma1 <- 0.020
+x2_bar <- 16.005; n2 <- 10; sigma2 <- 0.025
+alpha_2p_z <- 0.05
+
+# Cálculos
+# Fórmula: Z* = (x̄₁ - x̄₂) / sqrt(σ₁²/n₁ + σ₂²/n₂)
+z0_2p_z <- (x1_bar - x2_bar) / sqrt(sigma1^2/n1 + sigma2^2/n2)
+z_crit_2p_z <- qnorm(1 - alpha_2p_z/2)
+
+#Resultados
+cat("## 4. Prueba Z para Diferencia de Medias (σ conocidas) ##\n")
+cat("Estadístico de prueba Z*:", round(z0_2p_z, 4), "\n")
+cat("Valor crítico bilateral (±):", round(z_crit_2p_z, 4), "\n")
+cat("¿Rechazar H0 (bilateral)?:", abs(z0_2p_z) > z_crit_2p_z, "\n\n")
+
+
+## 5. Prueba para Diferencia de Medias (σ desconocidas e IGUALES) - Prueba t
+
+# Ho: μ₁ - μ₂ = 0
+# Ha: μ₁ - μ₂ < 0 (equivalente a μ₂ > μ₁)
+
+# Datos de entrada 
+n1_t_eq <- 10; x1_bar_t_eq <- 290; s1 <- 12
+n2_t_eq <- 15; x2_bar_t_eq <- 321; s2 <- 15
+alpha_t_eq <- 0.05
+
+#Cálculos
+# Varianza agrupada: Sp² = [(n₁-1)s₁² + (n₂-1)s₂²] / (n₁ + n₂ - 2)
+sp2 <- ((n1_t_eq-1)*s1^2 + (n2_t_eq-1)*s2^2) / (n1_t_eq + n2_t_eq - 2)
+sp <- sqrt(sp2)
+gl_eq <- n1_t_eq + n2_t_eq - 2
+
+# Estadístico t: T* = (x̄₁ - x̄₂) / (Sp * sqrt(1/n₁ + 1/n₂))
+t0_t_eq <- (x1_bar_t_eq - x2_bar_t_eq) / (sp * sqrt(1/n1_t_eq + 1/n2_t_eq))
+t_crit_unilateral_izq <- qt(alpha_t_eq, df = gl_eq)
+
+#Resultados
+cat("## 5. Prueba t para Diferencia de Medias (Varianzas Iguales) ##\n")
+cat("Estadístico de prueba T*:", round(t0_t_eq, 4), "\n")
+cat("Grados de libertad:", gl_eq, "\n")
+cat("Valor crítico unilateral (<):", round(t_crit_unilateral_izq, 4), "\n")
+cat("¿Rechazar H0 (unilateral <)?:", t0_t_eq < t_crit_unilateral_izq, "\n\n")
+
+
+## 6. Prueba para Diferencia de Medias (σ desconocidas y DIFERENTES) - Prueba t de Welch
+
+# Ho: μ₁ - μ₂ = 0
+# Ha: μ₁ - μ₂ ≠ 0
+
+# Datos de entrada 
+n1_w <- 15; x1_bar_w <- 24.2; s1_sq <- 10
+n2_w <- 10; x2_bar_w <- 23.9; s2_sq <- 20
+alpha_w <- 0.10
+
+# Cálculos
+# Estadístico t: T* = (x̄₁ - x̄₂) / sqrt(s₁²/n₁ + s₂²/n₂)
+t0_w <- (x1_bar_w - x2_bar_w) / sqrt(s1_sq/n1_w + s2_sq/n2_w)
+
+# Grados de libertad (Welch-Satterthwaite)
+num_gl <- (s1_sq/n1_w + s2_sq/n2_w)^2
+den_gl <- (s1_sq/n1_w)^2/(n1_w-1) + (s2_sq/n2_w)^2/(n2_w-1)
+gl_w <- floor(num_gl / den_gl) # Se redondea hacia abajo
+t_crit_w <- qt(1 - alpha_w/2, df = gl_w)
+
+# Resultados
+cat("## 6. Prueba t para Diferencia de Medias (Varianzas Diferentes) ##\n")
+cat("Estadístico de prueba T*:", round(t0_w, 4), "\n")
+cat("Grados de libertad (Welch):", gl_w, "\n")
+cat("Valor crítico bilateral (±):", round(t_crit_w, 4), "\n")
+cat("¿Rechazar H0 (bilateral)?:", abs(t0_w) > t_crit_w, "\n\n")
+
+## 7. Prueba para Diferencia de Proporciones (p₁ - p₂)
+
+# Ho: p₁ - p₂ = 0
+# Ha: p₁ - p₂ > 0
+
+# Datos de entrada
+rechazos1 <- 720; n1_2p <- 1720
+rechazos2 <- 429; n2_2p <- 1640
+alpha_2p <- 0.01
+
+# Cálculos
+p1_gorro <- rechazos1 / n1_2p
+p2_gorro <- rechazos2 / n2_2p
+p_pool <- (rechazos1 + rechazos2) / (n1_2p + n2_2p)
+
+# Estadístico Z*: Z* = (p̂₁ - p̂₂) / sqrt(p̄(1-p̄)(1/n₁ + 1/n₂))
+z0_2p <- (p1_gorro - p2_gorro) / sqrt(p_pool * (1 - p_pool) * (1/n1_2p + 1/n2_2p))
+z_crit_2p <- qnorm(1 - alpha_2p)
+
+# Resultados
+cat("## 7. Prueba Z para Diferencia de Proporciones ##\n")
+cat("Estadístico de prueba Z*:", round(z0_2p, 4), "\n")
+cat("Valor crítico unilateral (>):", round(z_crit_2p, 4), "\n")
+cat("¿Rechazar H0 (unilateral >)?:", z0_2p > z_crit_2p, "\n\n")
+
+
+## 8. Prueba para Cociente de Varianzas (σ₁²/σ₂²) - Prueba F
+
+# Ho: σ₁²/σ₂² = 1
+# Ha: σ₁²/σ₂² ≠ 1
+
+#Datos de entrada
+n1_f <- 36; s1_f <- 0.007507
+n2_f <- 36; s2_f <- 0.004391
+alpha_f <- 0.05
+
+# Cálculos
+# Estadístico F*: F* = s₁² / s₂²
+F0 <- s1_f^2 / s2_f^2
+gl1_f <- n1_f - 1
+gl2_f <- n2_f - 1
+
+# Valores críticos
+F_crit_inf <- qf(alpha_f/2, gl1_f, gl2_f)
+F_crit_sup <- qf(1 - alpha_f/2, gl1_f, gl2_f)
+
+#Resultados
+cat("## 8. Prueba F para Cociente de Varianzas ##\n")
+cat("Estadístico de prueba F*:", round(F0, 4), "\n")
+cat("Grados de libertad:", gl1_f, "y", gl2_f, "\n")
+cat("Valores críticos: [", round(F_crit_inf, 4), ",", round(F_crit_sup, 4), "]\n")
+cat("¿Rechazar H0 (bilateral)?:", (F0 < F_crit_inf) | (F0 > F_crit_sup), "\n")
+```
+
